@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: lechu-licences-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://lechu:lechu123@db:5432/lechulicences
+      - NEXTAUTH_SECRET=changeme123  # Change this in production
+      - NEXTAUTH_URL=http://localhost:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - lechu-network
+
+  db:
+    container_name: lechu-licences-db
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: lechu
+      POSTGRES_PASSWORD: lechu123
+      POSTGRES_DB: lechulicences
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - lechu-network
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8085:8080"
+    networks:
+      - lechu-network
+
+volumes:
+  postgres_data:
+
+networks:
+  lechu-network:
+    driver: bridge
